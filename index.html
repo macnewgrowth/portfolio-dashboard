@@ -524,8 +524,10 @@
     ];
     if (f.division === '고유') cols.push({ key: 'section', label: '자산구분' });
     cols.push(
-      { key: 'type', label: '투자유형' },
-      { key: 'principalBalance', label: isAgf ? '투자원금(원화환산)' : '투자원금잔액', num: true, render: function (h) { return money(h.principalBalance); } },
+      { key: 'firstInvestDate', label: '최초투자일' },
+      { key: 'investTotal', label: isAgf ? '투자원금(원화환산)' : '투자원금', num: true, render: function (h) { return money(h.investTotal); } },
+      { key: 'exitTotal', label: isAgf ? '회수총액(원화환산)' : '회수총액', num: true, render: function (h) { return money(h.exitTotal); } },
+      { key: 'principalBalance', label: isAgf ? '투자원금잔액(원화환산)' : '투자원금잔액', num: true, render: function (h) { return money(h.principalBalance); } },
       isAgf
         ? { key: 'bookValueUSD', label: '장부가(USD)', num: true, render: function (h) { return usd(h.bookValueUSD); } }
         : { key: 'bookValue', label: '장부가액', num: true, render: function (h) { return money(h.bookValue); } },
@@ -535,6 +537,8 @@
     );
     var foot = cols.map(function (c) {
       if (c.key === 'company') return '합계 ' + rows.length + '개';
+      if (c.key === 'investTotal') return money(sum(rows, function (h) { return h.investTotal; }));
+      if (c.key === 'exitTotal') return money(sum(rows, function (h) { return h.exitTotal; }));
       if (c.key === 'principalBalance') return money(sum(rows, function (h) { return h.principalBalance; }));
       if (c.key === 'bookValue') return money(sum(rows, function (h) { return h.bookValue; }));
       if (c.key === 'bookValueUSD') return usd(sum(rows, function (h) { return h.bookValueUSD; }));
