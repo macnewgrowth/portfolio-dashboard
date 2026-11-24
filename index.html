@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>신성장투자부문 투자현황</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #f1f3f6;
+    --border: #e2e5ea;
+    --text: #1b1f24;
+    --text-2: #5b6470;
+    --text-3: #8a929c;
+    --accent: #2453c7;
+    --accent-soft: #e8eefc;
+    --invest: #1a7f4b;
+    --invest-soft: #e5f5ec;
+    --exit: #b4471f;
+    --exit-soft: #fbebe4;
+    --warn-bg: #fff6db;
+    --warn-text: #7a5a00;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .05);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111418;
+      --surface: #191d22;
+      --surface-2: #20252b;
+      --border: #2c3238;
+      --text: #e8eaed;
+      --text-2: #a5adb7;
+      --text-3: #7a838d;
+      --accent: #7ea2ff;
+      --accent-soft: #1f2a44;
+      --invest: #5fd39a;
+      --invest-soft: #17322a;
+      --exit: #ff9d7a;
+      --exit-soft: #3a2219;
+      --warn-bg: #3a3112;
+      --warn-text: #f3d47a;
+      --shadow: none;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  a { color: var(--accent); text-decoration: none; cursor: pointer; }
+  a:hover { text-decoration: underline; }
+
+  header {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .bar {
+    max-width: 1280px; margin: 0 auto; padding: 12px 20px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .title { font-size: 17px; font-weight: 700; margin-right: 4px; }
+  .asof { color: var(--text-2); font-size: 13px; }
+  .spacer { flex: 1; }
+  .search { position: relative; }
+  .search input {
+    width: 260px; padding: 7px 10px 7px 30px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2);
+  }
+  .search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; background: var(--surface); }
+  .search svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text-3); }
+  .suggest {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 10;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12); max-height: 320px; overflow: auto; display: none;
+  }
+  .suggest div { padding: 7px 10px; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+  .suggest div:hover, .suggest div.on { background: var(--accent-soft); }
+  .suggest small { color: var(--text-3); white-space: nowrap; }
+  .btn {
+    border: 1px solid var(--border); background: var(--surface); border-radius: 8px;
+    padding: 6px 12px; cursor: pointer;
+  }
+  .btn:hover { background: var(--surface-2); }
+  nav.tabs { max-width: 1280px; margin: 0 auto; padding: 0 20px; display: flex; gap: 4px; overflow-x: auto; }
+  nav.tabs button {
+    border: 0; background: none; padding: 10px 14px; cursor: pointer; color: var(--text-2);
+    border-bottom: 2px solid transparent; white-space: nowrap; font-weight: 600;
+  }
+  nav.tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+  main { max-width: 1280px; margin: 0 auto; padding: 20px; }
+  .banner { background: var(--warn-bg); color: var(--warn-text); padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .card .label { color: var(--text-2); font-size: 13px; }
+  .card .value { font-size: 24px; font-weight: 700; margin-top: 2px; }
+  .card .sub { color: var(--text-3); font-size: 12px; margin-top: 2px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
+  .panel-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .panel-head h2 { font-size: 15px; margin: 0; }
+  .panel-head .meta { color: var(--text-2); font-size: 13px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 11px; cursor: pointer; font-size: 13px; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  select.fund { padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); max-width: 100%; }
+  label.toggle { display: inline-flex; gap: 6px; align-items: center; color: var(--text-2); font-size: 13px; cursor: pointer; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { font-size: 12px; color: var(--text-2); font-weight: 600; background: var(--surface-2); position: sticky; top: 0; cursor: pointer; user-select: none; }
+  th.num, td.num { text-align: right; }
+  th .arrow { color: var(--accent); margin-left: 2px; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.click { cursor: pointer; }
+  tr.inactive td { color: var(--text-3); }
+  tfoot td { font-weight: 700; background: var(--surface-2); }
+  td.wrap { white-space: normal; min-width: 180px; color: var(--text-2); }
+  .empty { padding: 28px; text-align: center; color: var(--text-3); }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .b-invest { background: var(--invest-soft); color: var(--invest); }
+  .b-exit { background: var(--exit-soft); color: var(--exit); }
+  .b-other { background: var(--surface-2); color: var(--text-2); }
+  .b-div { background: var(--accent-soft); color: var(--accent); }
+  .pos { color: var(--invest); }
+  .neg { color: var(--exit); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .info { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; padding: 14px 16px; }
+  .info dt { color: var(--text-2); }
+  .info dd { margin: 0; }
+  .company-title { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 80px 0; color: var(--text-2); }
+  .spin { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: s 1s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  .gate { max-width: 340px; margin: 72px auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 24px; }
+  .gate h2 { margin: 0 0 6px; font-size: 17px; }
+  .gate p { margin: 0 0 16px; color: var(--text-2); font-size: 13px; }
+  .gate input { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 15px; }
+  .gate button { width: 100%; margin-top: 10px; padding: 10px; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .gate .err { color: var(--exit); font-size: 13px; margin-top: 10px; min-height: 1em; }
+  @media (max-width: 900px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .search input { width: 100%; }
+    .search { flex: 1 1 100%; order: 5; }
+    .bar, nav.tabs, main { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="title">신성장투자부문 투자현황</span>
+    <span class="asof" id="asof"></span>
+    <span class="spacer"></span>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="회사명 검색" autocomplete="off">
+      <div class="suggest" id="suggest"></div>
+    </div>
+    <button class="btn" id="refresh" title="시트에서 최신 데이터 다시 읽기">새로고침</button>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="summary">요약</button>
+    <button data-tab="fund">펀드별</button>
+    <button data-tab="company">회사별</button>
+    <button data-tab="month">월별 투자·회수</button>
+  </nav>
+</header>
+<main id="main"><div class="loading"><div class="spin"></div>데이터를 불러오는 중…</div></main>
+
+<script>
+(function () {
+  'use strict';
+
+  var DIVISIONS = ['1본부', '2본부', '고유', 'AGF'];
+  var M = null;              // model
+  var IDX = {};              // derived indexes
+  var state = { tab: 'summary', fund: '', company: '', month: '', div: '', showInactive: false };
+  var sorts = {};            // tableId -> {key, dir}
+  var inApps = typeof google !== 'undefined' && google.script && google.script.run;
+  // 외부 호스팅(GitHub Pages)용 데이터 창구 주소. tools/build-pages.js 가 채운다. 비어 있으면 Apps Script 화면으로 동작.
+  var API_URL = "https://script.google.com/macros/s/AKfycbxqoSX3DVEsb_p6h1r4gF0_bdUbZVR2dCfDZ9Ty8CJrPMq76RaP8kZ-5Bvh-cbVouBt/exec";
+
+  // ---------- formatting ----------
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function full(v) { return v == null ? '' : Math.round(v).toLocaleString('ko-KR') + '원'; }
+  function eok(v) {
+    if (v == null || v === 0) return '-';
+    var x = v / 1e8;
+    var s = Math.abs(x) >= 1000 ? Math.round(x).toLocaleString('ko-KR') : x.toFixed(1);
+    if (s === '0.0' || s === '-0.0') s = (x < 0 ? '-' : '') + '0.0';
+    return s + '억';
+  }
+  function money(v) { return '<span title="' + esc(full(v)) + '">' + eok(v) + '</span>'; }
+  function usd(v) {
+    if (v == null || v === 0) return '-';
+    return '<span title="USD ' + Math.round(v).toLocaleString('en-US') + '">$' + (v / 1e6).toFixed(1) + 'M</span>';
+  }
+  function gain(v) {
+    if (v == null || v === 0) return '-';
+    return '<span class="' + (v > 0 ? 'pos' : 'neg') + '">' + money(v) + '</span>';
+  }
+  function divBadge(d) { return '<span class="badge b-div">' + esc(d) + '</span>'; }
+  function kindBadge(k) {
+    return k === 'invest' ? '<span class="badge b-invest">투자</span>'
+      : k === 'exit' ? '<span class="badge b-exit">회수</span>' : '<span class="badge b-other">기타</span>';
+  }
+  function monthLabel(m) { var p = m.split('-'); return p[0] + '년 ' + Number(p[1]) + '월'; }
+  function prevMonth() {
+    var d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 1);
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2);
+  }
+  function sum(arr, f) { return arr.reduce(function (s, x) { return s + (f(x) || 0); }, 0); }
+
+  // ---------- data ----------
+  function index() {
+    IDX.fundById = {};
+    M.funds.forEach(function (f) { IDX.fundById[f.id] = f; });
+    IDX.companies = {};
+    M.holdings.forEach(function (h) {
+      var c = IDX.companies[h.companyKey] || (IDX.companies[h.companyKey] = { key: h.companyKey, names: {}, holdings: [], txns: [] });
+      c.names[h.company] = (c.names[h.company] || 0) + 1;
+      c.holdings.push(h);
+    });
+    M.txns.forEach(function (t) {
+      var c = IDX.companies[t.companyKey];
+      if (c) c.txns.push(t);
+    });
+    IDX.companyList = Object.keys(IDX.companies).map(function (k) {
+      var c = IDX.companies[k];
+      c.name = Object.keys(c.names).sort(function (a, b) { return c.names[b] - c.names[a]; })[0];
+      c.active = c.holdings.some(function (h) { return h.active; });
+      c.bookValue = sum(c.holdings, function (h) { return h.bookValue; });
+      return c;
+    }).sort(function (a, b) { return a.name.localeCompare(b.name, 'ko'); });
+    var months = {};
+    M.txns.forEach(function (t) { if (t.kind !== 'other') months[t.date.slice(0, 7)] = true; });
+    IDX.months = Object.keys(months).sort().reverse();
+  }
+
+  var PASS_KEY = 'pf_passcode';
+  function getPass() { try { return localStorage.getItem(PASS_KEY) || ''; } catch (e) { return ''; } }
+  function setPass(v) { try { if (v) localStorage.setItem(PASS_KEY, v); else localStorage.removeItem(PASS_KEY); } catch (e) {} }
+
+  function renderGate(msg) {
+    document.getElementById('main').innerHTML =
+      '<form class="gate" id="gate"><h2>비밀번호 입력</h2>' +
+      '<p>본부 공용 비밀번호를 입력해 주세요. 이 브라우저에서는 다음부터 묻지 않습니다.</p>' +
+      '<input id="pass" type="password" autocomplete="current-password" placeholder="비밀번호" required>' +
+      '<button type="submit">확인</button><div class="err">' + esc(msg || '') + '</div></form>';
+    var input = document.getElementById('pass');
+    input.focus();
+    document.getElementById('gate').onsubmit = function (ev) {
+      ev.preventDefault();
+      setPass(input.value.trim());
+      load(false);
+    };
+  }
+
+  function load(force) {
+    if (window.__MODEL__ && !inApps && !API_URL) { renderLoading(); M = window.__MODEL__; afterLoad(); return; }
+    var pass = getPass();
+    if (!pass) { renderGate(); return; }
+    renderLoading();
+    fetchModel(pass, !!force, function (model) { M = model; afterLoad(); }, function (m) {
+      if (/WRONG_PASSCODE/.test(m)) { setPass(''); renderGate('비밀번호가 맞지 않습니다.'); return; }
+      if (/TOO_MANY_TRIES/.test(m)) { setPass(''); renderGate('시도가 너무 많습니다. 10분 뒤에 다시 해 주세요.'); return; }
+      if (/NO_PASSCODE_SET/.test(m)) m = '관리자가 아직 비밀번호를 설정하지 않았습니다.';
+      document.getElementById('main').innerHTML = '<div class="banner">데이터를 불러오지 못했습니다: ' + esc(m) + '</div>';
+    });
+  }
+
+  // 성공하면 ok(model), 실패하면 fail(오류 메시지)
+  function fetchModel(pass, force, ok, fail) {
+    if (inApps) {
+      google.script.run
+        .withSuccessHandler(function (json) { ok(JSON.parse(json)); })
+        .withFailureHandler(function (e) { fail(String(e && e.message || e)); })
+        .getModel(pass, force);
+      return;
+    }
+    // 문자열 본문(text/plain)이라 사전 확인 요청 없이 보낸다. Google 로그인 쿠키는 보내지 않는다.
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ passcode: pass, force: force }), credentials: 'omit', redirect: 'follow' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok) ok(j.model); else fail(String(j && j.error || '알 수 없는 오류')); })
+      .catch(function (e) { fail('서버에 연결하지 못했습니다 (' + (e && e.message || e) + ')'); });
+  }
+  function afterLoad() {
+    index();
+    document.getElementById('asof').textContent = '기준일 ' + (M.asOf || '-') + (M.loadedAt ? ' · ' + M.loadedAt + ' 불러옴' : '');
+    readLocation(render);
+  }
+
+  // ---------- routing ----------
+  function readLocation(cb) {
+    function apply(params) {
+      state.tab = params.tab || 'summary';
+      state.fund = params.fund || '';
+      state.company = params.company || '';
+      state.month = params.month || '';
+      cb();
+    }
+    if (inApps && google.script.url) {
+      google.script.url.getLocation(function (loc) {
+        var p = {};
+        Object.keys(loc.parameter || {}).forEach(function (k) { p[k] = loc.parameter[k]; });
+        apply(p);
+      });
+    } else {
+      var p = {};
+      location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
+        if (!kv) return;
+        var i = kv.indexOf('=');
+        p[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1));
+      });
+      apply(p);
+    }
+  }
+  function go(patch) {
+    Object.keys(patch).forEach(function (k) { state[k] = patch[k]; });
+    var params = { tab: state.tab };
+    if (state.tab === 'fund' && state.fund) params.fund = state.fund;
+    if (state.tab === 'company' && state.company) params.company = state.company;
+    if (state.tab === 'month' && state.month) params.month = state.month;
+    if (inApps && google.script.history) {
+      google.script.history.push(null, params);
+    } else {
+      var h = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+      history.replaceState(null, '', '#' + h);
+    }
+    render();
+    window.scrollTo(0, 0);
+  }
+  if (inApps && google.script.history) {
+    google.script.history.setChangeHandler(function () { readLocation(render); });
+  } else {
+    window.addEventListener('hashchange', function () { readLocation(render); });
+  }
+
+  // ---------- table ----------
+  /**
+   * cols: [{key, label, num, render(row), value(row)}]
+   * opts: {id, rows, sortKey, sortDir, onClick(row), rowClass(row), foot: [cells], empty}
+   */
+  function table(opts) {
+    var s = sorts[opts.id] || { key: opts.sortKey, dir: opts.sortDir || 'desc' };
+    var col = opts.cols.filter(function (c) { return c.key === s.key; })[0];
+    var rows = opts.rows.slice();
+    if (col) {
+      var val = col.value || function (r) { return r[col.key]; };
+      rows.sort(function (a, b) {
+        var x = val(a), y = val(b);
+        if (x == null) x = typeof y === 'number' ? -Infinity : '';
+        if (y == null) y = typeof x === 'number' ? -Infinity : '';
+        var c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'ko');
+        return s.dir === 'asc' ? c : -c;
+      });
+    }
+    var html = '<div class="table-wrap"><table data-table="' + opts.id + '"><thead><tr>';
+    opts.cols.forEach(function (c) {
+      html += '<th data-sort="' + c.key + '" class="' + (c.num ? 'num' : '') + '">' + esc(c.label) +
+        (s.key === c.key ? '<span class="arrow">' + (s.dir === 'asc' ? '▲' : '▼') + '</span>' : '') + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    if (!rows.length) {
+      html += '<tr><td colspan="' + opts.cols.length + '" class="empty">' + (opts.empty || '데이터가 없습니다') + '</td></tr>';
+    }
+    rows.forEach(function (r, i) {
+      var cls = (opts.onClick ? 'click ' : '') + (opts.rowClass ? opts.rowClass(r) : '');
+      html += '<tr class="' + cls + '" data-i="' + i + '">';
+      opts.cols.forEach(function (c) {
+        html += '<td class="' + (c.num ? 'num' : '') + (c.wrap ? ' wrap' : '') + '">' + (c.render ? c.render(r) : esc(r[c.key])) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    if (opts.foot && rows.length) {
+      html += '<tfoot><tr>' + opts.foot.map(function (f, i) {
+        return '<td class="' + (opts.cols[i] && opts.cols[i].num ? 'num' : '') + '">' + (f == null ? '' : f) + '</td>';
+      }).join('') + '</tr></tfoot>';
+    }
+    html += '</table></div>';
+    var bind = function (root) {
+      var t = root.querySelector('table[data-table="' + opts.id + '"]');
+      if (!t) return;
+      t.querySelectorAll('th').forEach(function (th) {
+        th.onclick = function () {
+          var k = th.getAttribute('data-sort');
+          var cur = sorts[opts.id] || s;
+          var c = opts.cols.filter(function (x) { return x.key === k; })[0];
+          sorts[opts.id] = { key: k, dir: cur.key === k ? (cur.dir === 'asc' ? 'desc' : 'asc') : (c.num ? 'desc' : 'asc') };
+          render();
+        };
+      });
+      if (opts.onClick) {
+        t.querySelectorAll('tbody tr[data-i]').forEach(function (tr) {
+          tr.onclick = function () { opts.onClick(rows[Number(tr.getAttribute('data-i'))]); };
+        });
+      }
+    };
+    return { html: html, bind: bind };
+  }
+
+  // ---------- views ----------
+  function renderLoading() {
+    document.getElementById('main').innerHTML = '<div class="loading"><div class="spin"></div>데이터를 불러오는 중…</div>';
+  }
+
+  function render() {
+    if (!M) return;
+    document.querySelectorAll('#tabs button').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-tab') === state.tab);
+    });
+    var parts = [];
+    if (M.warnings && M.warnings.length) parts.push({ html: '<div class="banner">' + M.warnings.map(esc).join('<br>') + '</div>' });
+    var view = { summary: viewSummary, fund: viewFund, company: viewCompany, month: viewMonth }[state.tab] || viewSummary;
+    parts = parts.concat(view());
+    var main = document.getElementById('main');
+    main.innerHTML = parts.map(function (p) { return p.html; }).join('');
+    parts.forEach(function (p) { if (p.bind) p.bind(main); });
+  }
+
+  function card(label, value, sub) {
+    return '<div class="card"><div class="label">' + label + '</div><div class="value">' + value + '</div>' +
+      (sub ? '<div class="sub">' + sub + '</div>' : '') + '</div>';
+  }
+
+  function viewSummary() {
+    var krwFunds = M.funds.filter(function (f) { return f.division !== 'AGF'; });
+    var totalBook = sum(krwFunds, function (f) { return f.bookValue; });
+    var agfUsd = sum(M.funds, function (f) { return f.bookValueUSD; });
+    var activeCompanies = IDX.companyList.filter(function (c) { return c.active; }).length;
+    var pm = prevMonth();
+    var mt = M.txns.filter(function (t) { return t.date.slice(0, 7) === pm; });
+    var inv = mt.filter(function (t) { return t.kind === 'invest'; });
+    var ex = mt.filter(function (t) { return t.kind === 'exit'; });
+
+    var cards = '<div class="cards">' +
+      card('총 장부가 (KRW)', '<span title="' + esc(full(totalBook)) + '">' + eok(totalBook) + '</span>', agfUsd ? 'AGF 별도 ' + usd(agfUsd) : '1본부·2본부·고유 합계') +
+      card('펀드 · 계정', M.funds.length + '개', DIVISIONS.map(function (d) { return d + ' ' + M.funds.filter(function (f) { return f.division === d; }).length; }).join(' · ')) +
+      card('보유 포트폴리오', activeCompanies + '개사', '장부가 또는 잔액이 남아 있는 회사 (중복 제거)') +
+      card('<a data-go-month="' + pm + '">' + monthLabel(pm) + ' 투자 · 회수 →</a>',
+        '<span class="pos">' + inv.length + '</span> · <span class="neg">' + ex.length + '</span>건',
+        '투자 ' + eok(sum(inv, function (t) { return t.investKRW; })) + ' · 회수 ' + eok(sum(ex, function (t) { return t.exitKRW; }))) +
+      '</div>';
+
+    var rows = M.funds.filter(function (f) { return !state.div || f.division === state.div; });
+    var chips = '<div class="chips">' + [''].concat(DIVISIONS).map(function (d) {
+      return '<button class="chip' + (state.div === d ? ' on' : '') + '" data-div="' + d + '">' + (d || '전체') + '</button>';
+    }).join('') + '</div>';
+    var t = table({
+      id: 'funds', rows: rows, sortKey: 'bookValue',
+      cols: [
+        { key: 'division', label: '구분', render: function (f) { return divBadge(f.division); } },
+        { key: 'name', label: '펀드명', render: function (f) { return '<a>' + esc(f.name) + '</a>'; } },
+        { key: 'activeCount', label: '보유 / 전체', num: true, render: function (f) { return f.activeCount + ' / ' + f.holdingCount; } },
+        { key: 'principalBalance', label: '투자원금잔액', num: true, render: function (f) { return money(f.principalBalance); } },
+        { key: 'bookValue', label: '장부가', num: true, value: function (f) { return f.division === 'AGF' ? null : f.bookValue; },
+          render: function (f) { return f.division === 'AGF' ? usd(f.bookValueUSD) : money(f.bookValue); } },
+      ],
+      onClick: function (f) { go({ tab: 'fund', fund: f.id }); },
+      foot: ['합계', rows.length + '개', null,
+        money(sum(rows, function (f) { return f.principalBalance; })),
+        money(sum(rows, function (f) { return f.division === 'AGF' ? 0 : f.bookValue; }))],
+    });
+    return [
+      { html: cards, bind: function (root) {
+        root.querySelectorAll('[data-go-month]').forEach(function (a) { a.onclick = function () { go({ tab: 'month', month: a.getAttribute('data-go-month') }); }; });
+      } },
+      { html: '<div class="panel"><div class="panel-head"><h2>펀드별 현황</h2>' + chips +
+          '<span class="spacer"></span><span class="meta">AGF 장부가는 USD, 합계에서 제외</span></div>' + t.html + '</div>',
+        bind: function (root) {
+          t.bind(root);
+          root.querySelectorAll('[data-div]').forEach(function (b) { b.onclick = function () { state.div = b.getAttribute('data-div'); render(); }; });
+        } },
+    ];
+  }
+
+  function fundSelect(selected) {
+    var html = '<select class="fund" id="fundSel"><option value="">펀드를 선택하세요</option>';
+    DIVISIONS.forEach(function (d) {
+      var fs = M.funds.filter(function (f) { return f.division === d; });
+      if (!fs.length) return;
+      html += '<optgroup label="' + d + '">' + fs.map(function (f) {
+        return '<option value="' + esc(f.id) + '"' + (f.id === selected ? ' selected' : '') + '>' + esc(f.name) + '</option>';
+      }).join('') + '</optgroup>';
+    });
+    return html + '</select>';
+  }
+
+  function viewFund() {
+    var f = IDX.fundById[state.fund];
+    var head = '<div class="panel-head">' + fundSelect(state.fund) +
+      '<label class="toggle"><input type="checkbox" id="inactive"' + (state.showInactive ? ' checked' : '') + '> 회수 완료 포함</label>';
+    var bindHead = function (root) {
+      root.querySelector('#fundSel').onchange = function (e) { go({ fund: e.target.value }); };
+      root.querySelector('#inactive').onchange = function (e) { state.showInactive = e.target.checked; render(); };
+    };
+    if (!f) {
+      return [{ html: '<div class="panel">' + head + '</div><div class="empty">위에서 펀드를 선택하거나, 요약 탭에서 펀드를 클릭하세요.</div></div>', bind: bindHead }];
+    }
+    var isAgf = f.division === 'AGF';
+    var all = M.holdings.filter(function (h) { return h.fundId === f.id; });
+    var rows = all.filter(function (h) { return state.showInactive || h.active; });
+    head += '<span class="spacer"></span><span class="meta">' + divBadge(f.division) + ' 장부가 <b>' +
+      (isAgf ? usd(f.bookValueUSD) : money(f.bookValue)) + '</b> · 잔액 ' + money(f.principalBalance) +
+      ' · 보유 ' + f.activeCount + '개 / 전체 ' + f.holdingCount + '개</span></div>';
+    var cols = [
+      { key: 'company', label: '회사명', render: function (h) { return '<a>' + esc(h.company) + '</a>'; } },
+    ];
+    if (f.division === '고유') cols.push({ key: 'section', label: '자산구분' });
+    cols.push(
+      { key: 'type', label: '투자유형' },
+      { key: 'principalBalance', label: isAgf ? '투자원금(원화환산)' : '투자원금잔액', num: true, render: function (h) { return money(h.principalBalance); } },
+      isAgf
+        ? { key: 'bookValueUSD', label: '장부가(USD)', num: true, render: function (h) { return usd(h.bookValueUSD); } }
+        : { key: 'bookValue', label: '장부가액', num: true, render: function (h) { return money(h.bookValue); } },
+      { key: 'stake', label: '지분율', num: true, value: function (h) { return parseFloat(h.stake) || null; } },
+      { key: 'sector', label: '업종' },
+      { key: 'manager', label: '사후관리' }
+    );
+    var foot = cols.map(function (c) {
+      if (c.key === 'company') return '합계 ' + rows.length + '개';
+      if (c.key === 'principalBalance') return money(sum(rows, function (h) { return h.principalBalance; }));
+      if (c.key === 'bookValue') return money(sum(rows, function (h) { return h.bookValue; }));
+      if (c.key === 'bookValueUSD') return usd(sum(rows, function (h) { return h.bookValueUSD; }));
+      return null;
+    });
+    var t = table({
+      id: 'fund', rows: rows, sortKey: isAgf ? 'bookValueUSD' : 'bookValue', cols: cols, foot: foot,
+      rowClass: function (h) { return h.active ? '' : 'inactive'; },
+      onClick: function (h) { go({ tab: 'company', company: h.companyKey }); },
+      empty: state.showInactive ? '포트폴리오가 없습니다' : '보유 중인 포트폴리오가 없습니다. "회수 완료 포함"을 켜 보세요.',
+    });
+    return [{ html: '<div class="panel">' + head + t.html + '</div>', bind: function (root) { bindHead(root); t.bind(root); } }];
+  }
+
+  function viewCompany() {
+    var c = IDX.companies[state.company];
+    if (!c) {
+      var t0 = table({
+        id: 'companies', rows: IDX.companyList.filter(function (x) { return x.active; }), sortKey: 'bookValue',
+        cols: [
+          { key: 'name', label: '회사명', render: function (x) { return '<a>' + esc(x.name) + '</a>'; } },
+          { key: 'funds', label: '투자 펀드 수', num: true, value: function (x) { return x.holdings.filter(function (h) { return h.active; }).length; },
+            render: function (x) { return x.holdings.filter(function (h) { return h.active; }).length; } },
+          { key: 'bookValue', label: '장부가 합계 (KRW)', num: true, render: function (x) { return money(x.bookValue); } },
+          { key: 'sector', label: '업종', value: function (x) { return firstOf(x.holdings, 'sector'); }, render: function (x) { return esc(firstOf(x.holdings, 'sector')); } },
+        ],
+        onClick: function (x) { go({ company: x.key }); },
+      });
+      return [{ html: '<div class="panel"><div class="panel-head"><h2>보유 포트폴리오 전체</h2><span class="meta">위 검색창에서 회사를 찾거나 아래에서 선택하세요. 여러 펀드에 나뉜 투자를 회사 기준으로 합쳐 보여줍니다.</span></div>' + t0.html + '</div>', bind: t0.bind }];
+    }
+    var hs = c.holdings;
+    var info = '<div class="panel"><div style="padding:16px 16px 0"><h1 class="company-title">' + esc(c.name) + '</h1>' +
+      '<div class="meta" style="color:var(--text-2)">' + hs.filter(function (h) { return h.active; }).length + '개 펀드·계정에서 보유 · 장부가 합계 ' + money(c.bookValue) +
+      (sum(hs, function (h) { return h.bookValueUSD; }) ? ' + AGF ' + usd(sum(hs, function (h) { return h.bookValueUSD; })) : '') + '</div></div>' +
+      '<dl class="info">' +
+      infoRow('업종', firstOf(hs, 'sector')) + infoRow('주요사업', firstOf(hs, 'business')) + infoRow('투자지역', firstOf(hs, 'region')) +
+      infoRow('투자유형', uniq(hs, 'type')) + infoRow('발굴', uniq(hs, 'sourcer')) + infoRow('심사', uniq(hs, 'reviewer')) + infoRow('사후관리', uniq(hs, 'manager')) +
+      (Object.keys(c.names).length > 1 ? infoRow('시트 표기', Object.keys(c.names).join(', ')) : '') +
+      '</dl></div>';
+    var th = table({
+      id: 'cHold', rows: hs, sortKey: 'bookValue',
+      cols: [
+        { key: 'division', label: '구분', render: function (h) { return divBadge(h.division); } },
+        { key: 'fundName', label: '펀드 · 계정', render: function (h) { return '<a>' + esc(h.fundName) + '</a>'; } },
+        { key: 'type', label: '투자유형' },
+        { key: 'principalBalance', label: '투자원금잔액', num: true, render: function (h) { return money(h.principalBalance); } },
+        { key: 'bookValue', label: '장부가', num: true, value: function (h) { return h.division === 'AGF' ? h.bookValueUSD : h.bookValue; },
+          render: function (h) { return h.division === 'AGF' ? usd(h.bookValueUSD) : money(h.bookValue); } },
+        { key: 'stake', label: '지분율', num: true, value: function (h) { return parseFloat(h.stake) || null; } },
+      ],
+      rowClass: function (h) { return h.active ? '' : 'inactive'; },
+      onClick: function (h) { go({ tab: 'fund', fund: h.fundId }); },
+      foot: ['합계', null, null, money(sum(hs, function (h) { return h.principalBalance; })), money(sum(hs, function (h) { return h.bookValue; })), null],
+    });
+    var tx = c.txns.filter(function (t) { return t.kind !== 'other' || t.note; });
+    var tt = table({
+      id: 'cTx', rows: tx, sortKey: 'date',
+      cols: [
+        { key: 'date', label: '일자' },
+        { key: 'kind', label: '구분', render: function (t) { return kindBadge(t.kind); } },
+        { key: 'fundName', label: '펀드 · 계정' },
+        { key: 'amount', label: '금액', num: true, value: txAmount, render: function (t) { return money(txAmount(t)); } },
+        { key: 'exitGainKRW', label: '회수손익', num: true, render: function (t) { return gain(t.exitGainKRW); } },
+        { key: 'note', label: '비고', wrap: true },
+      ],
+      empty: '거래 내역이 없습니다',
+    });
+    return [
+      { html: info },
+      { html: '<div class="panel"><div class="panel-head"><h2>펀드별 보유 현황</h2></div>' + th.html + '</div>', bind: th.bind },
+      { html: '<div class="panel"><div class="panel-head"><h2>거래 이력</h2><span class="meta">평가·손상 등 비고가 있는 기타 거래 포함</span></div>' + tt.html + '</div>', bind: tt.bind },
+    ];
+  }
+  function txAmount(t) { return t.kind === 'invest' ? t.investKRW : t.kind === 'exit' ? t.exitKRW : null; }
+  function firstOf(arr, k) { for (var i = 0; i < arr.length; i++) if (arr[i][k]) return arr[i][k]; return ''; }
+  function uniq(arr, k) {
+    var seen = {}; arr.forEach(function (x) { if (x[k]) seen[x[k]] = true; });
+    return Object.keys(seen).join(', ');
+  }
+  function infoRow(k, v) { return v ? '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>' : ''; }
+
+  function viewMonth() {
+    var month = state.month || prevMonth();
+    var months = IDX.months.slice();
+    if (months.indexOf(month) < 0) months.push(month);
+    months.sort().reverse();
+    var sel = '<select class="fund" id="monthSel">' + months.map(function (m) {
+      return '<option value="' + m + '"' + (m === month ? ' selected' : '') + '>' + monthLabel(m) + '</option>';
+    }).join('') + '</select>';
+    var mt = M.txns.filter(function (t) { return t.date.slice(0, 7) === month; });
+    var inv = mt.filter(function (t) { return t.kind === 'invest'; });
+    var ex = mt.filter(function (t) { return t.kind === 'exit'; });
+    var common = [
+      { key: 'date', label: '일자' },
+      { key: 'division', label: '구분', render: function (t) { return divBadge(t.division); } },
+      { key: 'fundName', label: '펀드 · 계정' },
+      { key: 'company', label: '회사', render: function (t) { return '<a>' + esc(t.company) + '</a>'; } },
+    ];
+    var ti = table({
+      id: 'mInv', rows: inv, sortKey: 'date', sortDir: 'asc',
+      cols: common.concat([
+        { key: 'investKRW', label: '투자금액', num: true, render: function (t) { return money(t.investKRW); } },
+        { key: 'note', label: '비고', wrap: true },
+      ]),
+      onClick: function (t) { go({ tab: 'company', company: t.companyKey }); },
+      foot: ['합계', null, null, inv.length + '건', money(sum(inv, function (t) { return t.investKRW; })), null],
+      empty: monthLabel(month) + '에 신규 투자가 없습니다',
+    });
+    var te = table({
+      id: 'mExit', rows: ex, sortKey: 'date', sortDir: 'asc',
+      cols: common.concat([
+        { key: 'exitKRW', label: '회수원금', num: true, render: function (t) { return money(t.exitKRW); } },
+        { key: 'exitGainKRW', label: '회수손익', num: true, value: function (t) { return t.exitGainKRW; },
+          render: function (t) { return t.exitGainUSD != null && t.exitGainKRW == null ? usd(t.exitGainUSD) : gain(t.exitGainKRW); } },
+        { key: 'note', label: '비고', wrap: true },
+      ]),
+      onClick: function (t) { go({ tab: 'company', company: t.companyKey }); },
+      foot: ['합계', null, null, ex.length + '건', money(sum(ex, function (t) { return t.exitKRW; })), gain(sum(ex, function (t) { return t.exitGainKRW; })), null],
+      empty: monthLabel(month) + '에 회수가 없습니다',
+    });
+    return [
+      { html: '<div class="cards">' +
+          card('조회 월', sel) +
+          card('신규 투자', '<span class="pos">' + inv.length + '건</span>', eok(sum(inv, function (t) { return t.investKRW; }))) +
+          card('회수', '<span class="neg">' + ex.length + '건</span>', '원금 ' + eok(sum(ex, function (t) { return t.exitKRW; })) + ' · 손익 ' + eok(sum(ex, function (t) { return t.exitGainKRW; }))) +
+          '</div>',
+        bind: function (root) { root.querySelector('#monthSel').onchange = function (e) { go({ month: e.target.value }); }; } },
+      { html: '<div class="panel"><div class="panel-head"><h2>신규 투자</h2><span class="meta">투자원금이 들어간 거래 (후속 투자 포함)</span></div>' + ti.html + '</div>', bind: ti.bind },
+      { html: '<div class="panel"><div class="panel-head"><h2>회수</h2><span class="meta">회수원금이 발생한 거래 · AGF 손익은 USD</span></div>' + te.html + '</div>', bind: te.bind },
+    ];
+  }
+
+  // ---------- search ----------
+  var q = document.getElementById('q');
+  var sug = document.getElementById('suggest');
+  var hits = [], cur = -1;
+  function norm(s) { return String(s).toLowerCase().replace(/㈜|\(주\)|주식회사|[\s,.]/g, ''); }
+  q.addEventListener('input', function () {
+    var v = norm(q.value);
+    if (!v || !M) { sug.style.display = 'none'; return; }
+    hits = IDX.companyList.filter(function (c) {
+      return Object.keys(c.names).some(function (n) { return norm(n).indexOf(v) >= 0; });
+    }).sort(function (a, b) { return (b.active - a.active) || (b.bookValue - a.bookValue); }).slice(0, 12);
+    cur = hits.length ? 0 : -1;
+    drawSug();
+  });
+  function drawSug() {
+    sug.innerHTML = hits.length ? hits.map(function (c, i) {
+      return '<div data-i="' + i + '" class="' + (i === cur ? 'on' : '') + '"><span>' + esc(c.name) + '</span><small>' +
+        (c.active ? eok(c.bookValue) + ' · ' + c.holdings.filter(function (h) { return h.active; }).length + '개 펀드' : '회수 완료') + '</small></div>';
+    }).join('') : '<div style="color:var(--text-3)">검색 결과 없음</div>';
+    sug.style.display = 'block';
+    sug.querySelectorAll('[data-i]').forEach(function (d) {
+      d.onmousedown = function (e) { e.preventDefault(); pick(hits[Number(d.getAttribute('data-i'))]); };
+    });
+  }
+  function pick(c) {
+    if (!c) return;
+    q.value = ''; sug.style.display = 'none'; q.blur();
+    go({ tab: 'company', company: c.key });
+  }
+  q.addEventListener('keydown', function (e) {
+    if (sug.style.display !== 'block') return;
+    if (e.key === 'ArrowDown') { cur = Math.min(cur + 1, hits.length - 1); drawSug(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { cur = Math.max(cur - 1, 0); drawSug(); e.preventDefault(); }
+    else if (e.key === 'Enter') { pick(hits[cur]); e.preventDefault(); }
+    else if (e.key === 'Escape') { sug.style.display = 'none'; }
+  });
+  q.addEventListener('blur', function () { setTimeout(function () { sug.style.display = 'none'; }, 100); });
+
+  // ---------- wiring ----------
+  document.querySelectorAll('#tabs button').forEach(function (b) {
+    b.onclick = function () { go({ tab: b.getAttribute('data-tab') }); };
+  });
+  document.getElementById('refresh').onclick = function () { load(true); };
+  load(false);
+})();
+</script>
+</body>
+</html>
